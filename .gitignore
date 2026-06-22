@@ -20,6 +20,7 @@
 
 # RStudio files
 .Rproj.user/
+*.html
 
 # produced vignettes
 vignettes/*.html
@@ -48,4 +49,10 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
-*/check_species_laa
+# Large/generated outputs not tracked in git
+raw_data/
+cleaning_codes/*/check_species_laa
+cleaning_codes/*/merged_survey_data.rds
+cleaning_codes/*/log_survey_data.rds
+
+CLAUDE.md
