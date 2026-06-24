@@ -14,6 +14,7 @@ The total catch from the trawl or gillnet from which the aged fish where subsamp
 Currently the repo contains code that works with surveys hosted on the [DATRAS](https://datras.ices.dk/) database, where this is available. However there may be data sets where the total catches, from which the aged fish were subsampled, are not now, or data sets where only summaries, not individual-level data, are not available.
 
 ## Regions & Surveys
+An overview of data currently available (species, survey, and year) can be found in **[summary](summary)**.
 
 | Region | Data source | Output prefix | Surveys | Script folder |
 |---|---|---|---|---|
