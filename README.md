@@ -2,14 +2,16 @@
 
 Data collation pipeline for [ICES WGGRAFY](https://www.ices.dk/community/groups/Pages/Wggrafy.aspx) (Working Group on Impacts of Warming on Growth Rates and Fisheries Yields). The goal is a standardised, multi-region dataset of size-at-age observations from scientific bottom trawl surveys, for use in growth and fisheries yield analyses.
 
-The structure is inspired by [FishGlob](https://github.com/fishglob/FishGlob_data), but instead each region has its own cleaning pipeline that handles all surveys within it and standardises them to a common format, before a final merge step combines all regions.
+The structure is inspired by [FishGlob](https://github.com/fishglob/FishGlob_data), but each region has its own cleaning pipeline that handles all surveys within it and standardises them to a common format. A final script merges all regions.
 
-We envision data size-at-age data will be available at different levels in different places. In the ideal scenario, each region contributes two data products:
+We envision size-at-age data will be available at different levels in different places. In the ideal scenario, each region contributes two data products:
 
 - **Individual length-at-age records** (`ind_age`): one row per measured and aged fish.
-- **Length-frequency distributions** (`len_freq`): one row per haul × length class, covering all length classes regardless of whether fish were aged. These are required to account for length-stratified subsampling when estimating growth from survey data (see [Perreault et al. (2020)](https://doi.org/10.1139/cjfas-2019-0129)).
+- **Length-frequency distributions** (`len_freq`): catch by length class (one row per haul × length class), covering all length classes regardless of whether fish were aged.
 
-Currently the repo contains code that works with DATRAS data where this is available. We will need to rethink the structure once we have data with less information available.
+The total catch from the trawl or gillnet from which the aged fish where subsampled is needed to avoid biased estimates of growth parameters caused by the is length-stratified subsampling. While there are many methods for dealing with this bias, a relatively simple and promising method that lets the analsyst work with individual-level size-at-age data from the aged sample is the "empirical proportion" method. This method fits growth models to the aged subsample only, but includes the ratio between two proportions as a weight for an individual observation: 1) the proportion of fish in the entire sample that belonged to the fish’s length-bin and 2) the proportion of fish in the aged subsample that belonged to the sh’s length-bin (see [Chih 2009](https://doi.org/10.1577/M09-018.1); [Perreault et al. (2020)](https://doi.org/10.1139/cjfas-2019-0129); [Hilling et al. 2020](https://doi.org/10.1002/nafm.10429); [Lusk et al. (2021)](https://academic.oup.com/najfm/article/41/3/570/7817432); and references therein).
+
+Currently the repo contains code that works with surveys hosted on the [DATRAS](https://datras.ices.dk/) database, where this is available. However there may be data sets where the total catches, from which the aged fish were subsampled, are not now, or data sets where only summaries, not individual-level data, are not available.
 
 ## Regions & Surveys
 
@@ -25,7 +27,7 @@ To use the compiled data, either:
 
 - Use the region-specific cleaned files (e.g. `nea_datras_length_clean.rds`, `nea_datras_catch_clean.rds`) and run **[cleaning_codes/merge.R](cleaning_codes/merge.R)** to recompile.
 
-The output format is defined in **[standard_formats/](standard_formats/)**. All paths resolve via `here::here()`. Open `wggrafy-data.Rproj` before running any script.
+The output format is defined in **[standard_formats/](standard_formats/)**.
 
 ## Repository structure
 
@@ -90,7 +92,9 @@ Full column specifications (types, required fields, descriptions) are in [standa
 
 ## TODO
 
-* Include or not include raw data? It's only 150 MB for entire DATRAS...
+* We envision size-at-age data will be available at different levels in different places. In the ideal scenario, each region contributes two data products:
+
+* Include or not include raw data? It's only 150 MB for DATRAS across all surveys!
 
 * Shape files for each region?
 
