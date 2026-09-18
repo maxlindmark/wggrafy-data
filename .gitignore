@@ -56,3 +56,5 @@ cleaning_codes/*/merged_survey_data.rds
 cleaning_codes/*/log_survey_data.rds
 
 CLAUDE.md
+
+test-scripts.R
