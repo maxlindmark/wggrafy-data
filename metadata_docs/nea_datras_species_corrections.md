@@ -3,14 +3,14 @@
 Corrections applied in `cleaning_codes/north-east-atlantic-datras/clean_north_east_atlantic_datras.R`.  
 All issues were identified from per-species length-at-age plots (coloured by `lngt_code`) saved in `cleaning_codes/north-east-atlantic-datras/check_species_laa/`.
 
-The dominant error pattern is `lngt_code == 1` records where lengths were stored in mm but treated as cm, producing values 10× too large. Where dividing by 10 yields a biologically plausible result the fix is applied; where it does not (values still implausible after correction), records are removed instead.
+The dominant error pattern is lengths 10× too large. In BITS and NS-IBTS these are `lngt_code == 1` records where lengths were stored in mm but treated as cm. In SP-NORTH 2017 (*Zeus faber*, *Trisopterus luscus*) the code is `.` (mm) but `lngt_clas` is 10× too large for mm. Where dividing by 10 yields a biologically plausible result the fix is applied; where it does not (values still implausible after correction), records are removed instead.
 
 ## Summary table
 
 | Species | Survey(s) | Issue | Fix |
 |---|---|---|---|
-| *Zeus faber* | all | mm stored as cm (`lngt_cm > 100`) | ÷ 10; residual values > 75 cm removed |
-| *Trisopterus luscus* | all | mm stored as cm (`lngt_cm > 50`) | ÷ 10 |
+| *Zeus faber* | all (found in SP-NORTH 2017) | `lngt_code .` but value 10× too large (`lngt_cm > 100`) | ÷ 10; residual values > 75 cm removed |
+| *Trisopterus luscus* | all (found in SP-NORTH 2017) | `lngt_code .` but value 10× too large (`lngt_cm > 50`) | ÷ 10 |
 | *Platichthys flesus* | BITS | mm stored as cm (`lngt_cm > 70`) | ÷ 10; records with age > 30 removed |
 | *Lepidorhombus boscii* | SP-NORTH | horizontal band at 50–90 cm unrelated to unit code | remove `lngt_cm > 45`; **TODO: age-0 range still implausible, needs further investigation** |
 | *Lepidorhombus whiffiagonis* | SP-NORTH, SP-PORC | outliers above species max (~60 cm) | remove `lngt_cm > 65`; **TODO: SP-NORTH age-0 still implausible, SP-PORC needs revisiting** |
@@ -28,10 +28,10 @@ The dominant error pattern is `lngt_code == 1` records where lengths were stored
 ## Species notes
 
 ### *Zeus faber* (John Dory, max ~90 cm)
-Unit mismatch: `lngt_cm > 100` divided by 10. After correction a residual cloud of age-1 fish remains above 75 cm, which is still implausible; these are removed with a hard filter.
+SP-NORTH 2017 records have `lngt_code .` (mm) but values 10× too large: `lngt_cm > 100` divided by 10. After correction a residual cloud of age-1 fish remains above 75 cm, which is still implausible; these are removed with a hard filter.
 
 ### *Trisopterus luscus* (Pouting, max ~45 cm)
-Straightforward unit mismatch: values above 50 cm divided by 10.
+SP-NORTH 2017 records have `lngt_code .` (mm) but values 10× too large: values above 50 cm divided by 10.
 
 ### *Platichthys flesus* (European Flounder, max ~60 cm)
 Unit mismatch confined to BITS survey. After ÷ 10 fix, a handful of age records above 30 years remain; these are biologically implausible and removed.

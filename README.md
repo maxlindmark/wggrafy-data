@@ -93,16 +93,10 @@ Full column specifications (types, required fields, descriptions) are in [standa
 
 ## TODO
 
-* We envision size-at-age data will be available at different levels in different places. In the ideal scenario, each region contributes two data products:
-
 * Include or not include raw data? It's only 150 MB for DATRAS across all surveys!
 
 * Shape files for each region?
 
-* How do we make room for regions/surveys that don't have "tier 1" level data? I.e., length-at-age and length-frequency? (Related: what are the tiers? only length-at-age, without haul-level catch? only summarised length-at-age?
-
 * More detailed proof checking of DATRAS collation logs + final data
-
-* Should we scan DATRAS for CA species with no n_k data? See data "tiers"
 
 * That Canadian survey on DATRAS (Can-Mar) & the Mediterranian one
