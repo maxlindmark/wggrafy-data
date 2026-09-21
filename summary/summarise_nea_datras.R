@@ -1,11 +1,11 @@
 # Purpose:   Summary plots and data coverage table for cleaned NEA DATRAS data.
 #
-# Input:     outputs/nea_datras_length_clean.rds
+# Input:     outputs/north-east-atlantic-datras/nea_datras_length_clean.rds
 #
 # Output:    summary/species_overview_nea_datras.png
 #            (meta table printed to console)
 #
-# Modified:  2026-06-22
+# Modified:  2026-09-21
 # Author:    Max Lindmark
 
 library(dplyr)
@@ -15,7 +15,7 @@ library(ggtext)
 library(here)
 home <- here::here()
 
-ca_all <- readRDS(file.path(home, "outputs/nea_datras_length_clean.rds"))
+ca_all <- readRDS(file.path(home, "outputs/north-east-atlantic-datras/nea_datras_length_clean.rds"))
 
 # -----------------------------------------------------------------------------
 # Species × year coverage bubble plot
