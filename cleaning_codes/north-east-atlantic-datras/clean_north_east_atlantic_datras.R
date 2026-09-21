@@ -3,12 +3,12 @@
 #
 # Input:     cleaning_codes/north-east-atlantic-datras/merged_survey_data.rds
 #
-# Output:    outputs/nea_datras_length_clean.rds
-#            outputs/nea_datras_catch_clean.rds
+# Output:    outputs/north-east-atlantic-datras/nea_datras_length_clean.rds
+#            outputs/north-east-atlantic-datras/nea_datras_catch_clean.rds
 #            cleaning_codes/north-east-atlantic-datras/check_species_laa/*.png
 #            information for metadata_docs
 #
-# Modified:  2026-06-22
+# Modified:  2026-09-21
 # Author:    Max Lindmark
 
 library(tidyr)
@@ -18,6 +18,7 @@ library(ggplot2)
 theme_set(theme_light())
 library(here)
 library(writexl)
+library(tidylog)
 home <- here::here()
 
 results <- readRDS(file.path(home, "cleaning_codes/north-east-atlantic-datras/merged_survey_data.rds"))
@@ -35,8 +36,6 @@ ca_all <- bind_rows(lapply(names(results), function(s) {
     year = year(date)
   )
 }))
-
-head(ca_all$year)
 
 hl_all <- bind_rows(lapply(names(results), function(s) {
   df <- results[[s]]$hl
@@ -110,9 +109,8 @@ for (sp in sort(unique(ca_all$species))) {
   ggsave(fname, p, width = 10, height = 6, dpi = 150)
 }
 
-# Species-specific unit fixes identified from check_species_laa/problem plots.
-# Pattern: lngt_code == 1 but lngt_clas stored in mm — divide lngt_cm by 10
-# where values exceed a species-specific plausible maximum.
+# Species-specific unit fixes identified from check_species_laa/problem plots saved above.
+# E.g., lngt_code == 1 but lngt_clas stored in mm — divide lngt_cm by 10
 
 # Zeus faber (max ~90 cm): first fix unit mismatch, then remove residual
 # implausible values above 75 cm (age-1 fish seen above 75 cm in plots)
@@ -223,11 +221,49 @@ for (sp in problem_species) {
   ggsave(fname, p, width = 10, height = 6, dpi = 150)
 }
 
+# Sex of the aged fish: F, M or U (unsexed, including blank and other codes)
+ca_all <- ca_all |> mutate(sex = if_else(sex %in% c("F", "M"), sex, "U"))
+
+# Sampling type of the aged fish (unknown, random, length-stratified, ...).
+# This matters for if the individual-level analysis needs to to be weighted or not
+# TODO: for each survey, we'll make a lookup-table with that information and join 
+# in here. For now, unknown (but most likely dominated by length-stratfied sampling)
+ca_all <- ca_all |> mutate(sampling_type = "unknown")
+
 # Add region label before saving
 ca_all <- ca_all |> mutate(region = "North East Atlantic (DATRAS)")
 hl_all <- hl_all |>
   mutate(region = "North East Atlantic (DATRAS)") |>
   filter(species %in% unique(ca_all$species))
 
-saveRDS(ca_all, file.path(home, "outputs/nea_datras_length_clean.rds"))
-saveRDS(hl_all, file.path(home, "outputs/nea_datras_catch_clean.rds"))
+# -----------------------------------------------------------------------------
+# Lastly, add columns needed for the reweighting method (Chih 2009; Lusk et al. 2021):
+# Number of fish in the entire sample (catch, HL) and in the aged subsample (CA),
+# per haul*species*1 cm bin and per haul*species.
+# Note: lngt_code has three units ("." = 1 mm, "0" = 0.5 cm, "1" = 1 cm) and CA and HL
+# can use different codes within a haul, so they are matched on a common 1 cm bin
+# of lngt_cm (after the corrections above), not on lngt_clas/lngt_code.
+# Counts (and in a second stage, likelihood weights) that cannot be calculated are NA.
+# -----------------------------------------------------------------------------
+n_entire_bin <- hl_all |>
+  filter(!is.na(lngt_cm)) |>
+  mutate(lngt_bin = floor(lngt_cm)) |>
+  summarise(n_entire_bin = sum(n_entire_bin), .by = c(haul_id, valid_aphia, lngt_bin))
+
+n_entire <- n_entire_bin |>
+  summarise(n_entire = sum(n_entire_bin), .by = c(haul_id, valid_aphia))
+
+ca_all <- ca_all |>
+  mutate(lngt_bin = floor(lngt_cm)) |>
+  mutate(
+    n_aged_bin = if_else(is.na(lngt_bin), NA_integer_, n()),
+    .by = c(haul_id, valid_aphia, lngt_bin)
+  ) |>
+  mutate(n_aged = n(), .by = c(haul_id, valid_aphia)) |>
+  left_join(n_entire_bin, by = c("haul_id", "valid_aphia", "lngt_bin")) |>
+  left_join(n_entire, by = c("haul_id", "valid_aphia")) |>
+  dplyr::select(-lngt_bin)
+
+dir.create(file.path(home, "outputs/north-east-atlantic-datras"), recursive = TRUE, showWarnings = FALSE)
+saveRDS(ca_all, file.path(home, "outputs/north-east-atlantic-datras/nea_datras_length_clean.rds"))
+saveRDS(hl_all, file.path(home, "outputs/north-east-atlantic-datras/nea_datras_catch_clean.rds"))
