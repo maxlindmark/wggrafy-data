@@ -37,6 +37,8 @@ The output format is defined in **[standard_formats/](standard_formats/)**.
 - **[summary](summary)** contains overview figures of data coverage by species, survey, and year.
 - **[metadata_docs](metadata_docs)** documents survey-specific data quirks, manual corrections, and known issues (one file per region).
 
+Code formatting is done with [styler](https://styler.r-lib.org/) (`styler::tidyverse_style()`)
+
 ## Data processing steps
 
 Processing is done at the region level. The steps below describe the current DATRAS pipeline and serve as a template; other regions may differ depending on data format and available metadata.
@@ -118,16 +120,12 @@ Calculated from `ind_age`, and `len_freq` in case of length-stratified subsampli
 
 ## TODO
 
-* `sampling_type` is `unknown` for all records. In the final preparation, join a table of survey, year and sampling strategy (e.g. a csv) to fill it. It decides which records need weighting for length-stratified subsampling; the mean length at age uses the plain mean for `random` and the weighted mean for `length-stratified` and `unknown`.
+* `sampling_type` is `unknown` for all records in `north-east-atlantic-datras`. In the final preparation, join a table of survey, year and sampling strategy (e.g. a csv) to fill it. It decides which records need weighting for length-stratified subsampling; the mean length at age uses the plain mean for `random` and the weighted mean for `length-stratified` and `unknown`.
 
-* Sex-specific mean length at age: the sex ratio comes from the pooled sample of survey × species × `year_num`, within each 1 cm length bin. That is the level where about 91% of the aged fish sit in bins with more than 10 aged fish. Nothing is estimated at haul level, where most bins have a single aged fish. Pooled bins with few aged fish can still assign the whole catch of that bin to one sex. Options to consider: a minimum number of aged fish per bin for the sex-specific rows, borrowing the sex ratio from neighbouring length bins, and a bootstrap SE (eq. 4a does not include the uncertainty in the sex and age proportions).
-
-* ALK-raising by sex also?
+* Sex-specific mean length at age: the sex ratio comes from the pooled sample of survey*species*`year_num`, within each 1 cm length bin. Note this isn't calculated at the haul level (because in a haul, we may have to few samples to calulcate reliable sex-ratios by length bin (1 cm), whereas at the survey*species*`year_num` level, about 91% of the aged fish sit in bins with more than 10 aged fish). Anchor if this is valid!
 
 * Include or not include raw data? It's only 150 MB for DATRAS across all surveys!
 
 * Shape files for each region?
-
-* More detailed proof checking of DATRAS collation logs + final data
 
 * That Canadian survey on DATRAS (Can-Mar) & the Mediterranian one
