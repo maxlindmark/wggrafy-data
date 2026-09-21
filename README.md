@@ -12,7 +12,8 @@ Scientific surveys are conducted with different sampling protocols. Unless the s
 The total catch from the trawl from which the aged fish where subsampled is needed to avoid biased estimates of growth parameters caused by the is length-stratified subsampling. While there are many methods for dealing with this bias, a relatively simple and promising method that lets the analsyst work with individual-level size-at-age data from the aged sample is the "reweighting" method [Chih 2009](https://doi.org/10.1577/M09-018.1). This method fits growth models to the aged subsample only, but includes the ratio between two proportions as a weight for an individual observation: 1) the proportion of fish in the entire sample that belonged to the fish’s length-bin and 2) the proportion of fish in the aged subsample that belonged to the sh’s length-bin (see [Chih 2009](https://doi.org/10.1577/M09-018.1); [Perreault et al. (2020)](https://doi.org/10.1139/cjfas-2019-0129); [Hilling et al. 2020](https://doi.org/10.1002/nafm.10429); [Lusk et al. (2021)](https://academic.oup.com/najfm/article/41/3/570/7817432); and references therein).
 
 ## Regions & Surveys
-An overview of data currently available (species, survey, and year) can be found in **[summary](summary)**.
+
+This table is populated automatically by `cleaning_codes/merge.R` from the merged data. Do not edit it by hand.
 
 | Region | Data source | Output prefix | Surveys | Script folder |
 |---|---|---|---|---|
