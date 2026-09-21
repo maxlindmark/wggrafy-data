@@ -1,7 +1,7 @@
 # Purpose:   Download and reformat DATRAS trawl survey data for growth analysis.
 #            Reads exchange-format data for all surveys, filters to species with
 #            both length and age records, builds first-phase length frequencies
-#            (HL, n_k) and second-phase individual age data (CA), and saves a
+#            (HL, n_entire_bin) and second-phase individual age data (CA), and saves a
 #            single RDS list keyed by survey name.
 #
 # Output:    cleaning_codes/north-east-atlantic-datras/merged_survey_data.rds
@@ -9,7 +9,7 @@
 #            A named list; each element has $ca (one row per aged fish) and
 #            $hl (one row per haul * length class).
 #
-# Modified:  2026-06-22
+# Modified:  2026-09-21
 # Author:    Max Lindmark
 
 # remotes::install_github("tokami/DATRASextra")
@@ -80,26 +80,16 @@ for (i in seq_along(survey_paths)) {
           {
             surv_sp <- subset(surv, Valid_Aphia == j)
 
-            # N_k: first-phase raised count per haul x length stratum.
+            # n_entire_bin: entire-sample (catch) count per haul x length class.
             # Count = HLNoAtLngt * SubFactor, computed by the DATRAS package.
             # Sum across sex in case HL has separate rows per sex per length class.
-            # Keep ALL length strata (including those with no aged fish) — needed
-            # for the EP likelihood denominator (empty-stratum Q_k terms).
-            # LngtCode has three units: "." = 1 mm and "0" = 0.5 cm (LngtClas in mm),
-            # "1" = 1 cm (LngtClas in cm). HL and CA can use different codes within
-            # the same haul, so strata are joined on a common 1 cm bin of LngtCm
-            # (computed by DATRASextra for both tables), not on LngtClas/LngtCode.
-            n_k <- surv_sp[["HL"]] |>
+            # Keep ALL length classes (including those with no aged fish).
+            hl_list[[as.character(j)]] <- surv_sp[["HL"]] |>
               mutate(LngtCode = as.character(LngtCode)) |>
-              summarise(n_k = sum(Count, na.rm = TRUE), .by = c(haul.id, LngtClas, LngtCode, LngtCm))
-
-            n_k_bin <- n_k |>
-              filter(!is.na(LngtCm)) |>
-              mutate(lngt_bin = floor(LngtCm)) |>
-              summarise(n_k = sum(n_k), .by = c(haul.id, lngt_bin))
-
-            hl_list[[as.character(j)]] <- n_k |>
-              dplyr::select(-LngtCm) |>
+              summarise(
+                n_entire_bin = sum(Count, na.rm = TRUE),
+                .by = c(haul.id, LngtClas, LngtCode, LngtCm)
+              ) |>
               mutate(
                 valid_aphia = j,
                 species     = aphia_to_species[as.character(j)]
@@ -107,19 +97,15 @@ for (i in seq_along(survey_paths)) {
               janitor::clean_names()
 
             size_list[[as.character(j)]] <- surv_sp[["CA"]] |>
-              mutate(
-                LngtCode = as.character(LngtCode),
-                lngt_bin = floor(LngtCm)
-              ) |>
+              mutate(LngtCode = as.character(LngtCode), Sex = as.character(Sex)) |>
               left_join(
                 distinct(surv_sp[["HH"]], haul.id, .keep_all = TRUE) |>
                   dplyr::select(haul.id, lon, lat, Month, Day),
                 by = "haul.id"
               ) |>
-              left_join(n_k_bin, by = c("haul.id", "lngt_bin")) |>
               dplyr::select(
-                haul.id, NoAtALK, LngtClas, LngtCm, LngtCode, Age, IndWgt,
-                n_k, lon, lat, Year, Month, Day
+                haul.id, NoAtALK, LngtClas, LngtCm, LngtCode, Age, IndWgt, Sex,
+                lon, lat, Year, Month, Day
               ) |>
               # expand: one row per individual fish (NoAtALK > 1 means multiple
               # fish of the same length bin and age were grouped in DATRAS)
