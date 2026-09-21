@@ -55,6 +55,8 @@ survey_rows <- length_all |>
 new_section <- c(
   "## Regions & Surveys",
   "",
+  "This table is populated automatically by `cleaning_codes/merge.R` from the merged data. Do not edit it by hand.",
+  "",
   "| Region | Data source | Output prefix | Surveys | Script folder |",
   "|---|---|---|---|---|",
   survey_rows
