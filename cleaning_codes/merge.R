@@ -2,15 +2,15 @@
 #            dataset conforming to the standard format defined in
 #            standard_formats/data_format_template.xlsx.
 #
-# Input:     outputs/<region>_length_clean.rds
-#            outputs/<region>_catch_clean.rds
+# Input:     outputs/<region>/<prefix>_length_clean.rds
+#            outputs/<region>/<prefix>_catch_clean.rds
 #            [outputs from future regional pipelines]
 #
 # Output:    outputs/length_all.rds
 #            outputs/catch_all.rds
 #            updated README (data availability)
 #
-# Modified:  2026-06-22
+# Modified:  2026-09-21
 # Author:    Max Lindmark
 
 library(dplyr)
@@ -21,8 +21,8 @@ home <- here::here()
 # -----------------------------------------------------------------------------
 # Load regional outputs
 # -----------------------------------------------------------------------------
-nea_datras_length <- readRDS(file.path(home, "outputs/nea_datras_length_clean.rds"))
-nea_datras_catch <- readRDS(file.path(home, "outputs/nea_datras_catch_clean.rds"))
+nea_datras_length <- readRDS(file.path(home, "outputs/north-east-atlantic-datras/nea_datras_length_clean.rds"))
+nea_datras_catch <- readRDS(file.path(home, "outputs/north-east-atlantic-datras/nea_datras_catch_clean.rds"))
 
 # [add further regions here as new get_*.R pipelines are added]
 
