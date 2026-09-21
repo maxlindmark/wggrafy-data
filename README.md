@@ -127,6 +127,8 @@ Calculated from `ind_age`, and `len_freq` in case of length-stratified subsampli
 
 * Include or not include raw data? It's only 150 MB for DATRAS across all surveys!
 
-* Shape files for each region?
+* Shape files for each region? Or survey? (messy in DATRAS)
 
 * That Canadian survey on DATRAS (Can-Mar) & the Mediterranian one
+
+* In the DATRAS case, there are a lot of surveys overlappin in space. Do we aggregate length at age by survey or domain? Currently done by survey, but will need to merge this somehow. Sub-divisions?
