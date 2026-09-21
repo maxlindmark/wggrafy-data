@@ -229,7 +229,7 @@ ca_all <- ca_all |> mutate(sex = if_else(sex %in% c("F", "M"), sex, "U"))
 
 # Sampling type of the aged fish (unknown, random, length-stratified, ...).
 # This matters for if the individual-level analysis needs to to be weighted or not
-# TODO: for each survey, we'll make a lookup-table with that information and join 
+# TODO: for each survey, we'll make a lookup-table with that information and join
 # in here. For now, unknown (but most likely dominated by length-stratfied sampling)
 ca_all <- ca_all |> mutate(sampling_type = "unknown")
 
