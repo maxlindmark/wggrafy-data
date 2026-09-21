@@ -52,6 +52,9 @@ hl_all <- bind_rows(lapply(names(results), function(s) {
 # Age must be a non-negative integer; age == 0 (0-group) is valid
 ca_all <- ca_all |> filter(!is.na(age), age >= 0)
 
+# Length must be known (a handful of aged fish have no length)
+ca_all <- ca_all |> filter(!is.na(lngt_cm))
+
 # Drop hauls with missing coordinates (small number of DATRAS source gaps)
 ca_all <- ca_all |> filter(!is.na(lon), !is.na(lat))
 
