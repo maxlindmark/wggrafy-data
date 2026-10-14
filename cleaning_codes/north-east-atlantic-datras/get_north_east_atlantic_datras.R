@@ -9,7 +9,7 @@
 #            A named list; each element has $ca (one row per aged fish) and
 #            $hl (one row per haul * length class).
 #
-# Modified:  2026-09-21
+# Modified:  2026-10-13
 # Author:    Max Lindmark
 
 # remotes::install_github("tokami/DATRASextra")
@@ -26,8 +26,18 @@ home <- here::here()
 # -----------------------------------------------------------------------------
 # Download DATRAS data for all years and surveys
 # -----------------------------------------------------------------------------
+# Surveys to skip:
+# DWS: Irish deep-water survey (2006-2009), no CA (age) records in DATRAS
+# Can-Mar: Canadian Maritimes survey, outside the North East Atlantic region
+# Test-DATRAS: ICES test survey, not real data
+skip_surveys <- c("DWS", "Can-Mar", "Test-DATRAS")
+surveys <- setdiff(icesDatras::getSurveyList(), skip_surveys)
+
 # This takes a while..
-# download_datras(surveys = NULL, years = NULL, dir = paste0(home, "/raw_data/north-east-atlantic-datras/"))
+download_datras(
+  surveys = surveys, years = NULL, overwrite = FALSE, return_data = FALSE,
+  path = file.path(home, "raw_data/north-east-atlantic-datras")
+)
 
 
 # -----------------------------------------------------------------------------
@@ -36,6 +46,11 @@ home <- here::here()
 
 # Get survey names (folder names we just downloaded)
 survey_paths <- list.dirs(file.path(home, "raw_data/north-east-atlantic-datras"), recursive = FALSE)
+
+# Drop skipped surveys in case their folders exist from an older download
+survey_names <- basename(survey_paths)
+keep <- !(survey_names %in% skip_surveys)
+survey_paths <- survey_paths[keep]
 
 # Load aphia_id to species name table
 data("species_info", package = "DATRASextra")
