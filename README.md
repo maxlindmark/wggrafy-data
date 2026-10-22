@@ -13,19 +13,19 @@ The total catch from the trawl from which the aged fish where subsampled is need
 
 ## Regions & Surveys
 
-This table is populated automatically by `cleaning_codes/merge.R` from the merged data. Do not edit it by hand.
+This table is populated automatically by `cleaning_codes/merge.R` from the merged data.
 
 | Region | Data source | Output prefix | Surveys | Script folder |
 |---|---|---|---|---|
-| North East Atlantic (DATRAS) | DATRAS | `nea_datras` | BITS, BTS, BTS-GSA17, BTS-VIII, Can-Mar, CODS-Q4, DYFS, EVHOE, FR-CGFS, FR-WCGFS, IE-IAMS, IE-IGFS, NIGFS, NL-BSAS, NS-IBTS, NSSS, PT-IBTS, ROCKALL, SCOROC, SCOWCGFS, SE-SOUND, SNS, SP-ARSA, SP-NORTH, SP-PORC, SWC-IBTS | `cleaning_codes/north-east-atlantic-datras/` |
+| North East Atlantic (DATRAS) | DATRAS | `nea_datras` | BITS, BTS, BTS-VIII, DYFS, EVHOE, FR-CGFS, FR-WCGFS, IE-IAMS, IE-IGFS, NIGFS, NL-BSAS, NS-IBTS, NS-IDPS, NSSS, PT-IBTS, ROCKALL, SCOROC, SCOWCGFS, SE-SOUND, SNS, SP-ARSA, SP-NORTH, SP-PORC, SWC-IBTS | `cleaning_codes/north-east-atlantic-datras/` |
 
 ## Using the data
 
 To use the compiled data, either:
 
-- Use the merged outputs in **[outputs/](outputs/)** (`length_all.rds`, `catch_all.rds`); or
+- Use the merged outputs in **[outputs/](outputs/)** (`length_all.rds`, `catch_all.rds`, `mean_length_all.rds`); or
 
-- Use the region-specific cleaned files (e.g. `outputs/north-east-atlantic-datras/nea_datras_length_clean.rds` and `nea_datras_catch_clean.rds`).
+- Use the region-specific cleaned files (e.g. `outputs/north-east-atlantic-datras/nea_datras_length_clean.rds`, `nea_datras_catch_clean.rds` and `nea_datras_mean_length_at_age.rds`).
 
 The output format is defined in **[standard_formats/](standard_formats/)**.
 
@@ -51,7 +51,7 @@ Processing is done at the region level. The steps below describe the current DAT
 5. Add a `region` label and save cleaned `ind_age` and `len_freq` tables to `outputs/<region>/`
 6. Calculate mean length at age from the cleaned tables (`mean_length_at_age_<region>.R`)
 
-Once all regions are processed, run `cleaning_codes/merge.R` to bind them into `outputs/length_all.rds` and `outputs/catch_all.rds`.
+Once all regions are processed, run `cleaning_codes/merge.R` to bind them into `outputs/length_all.rds`, `outputs/catch_all.rds` and `outputs/mean_length_all.rds`.
 
 ## Output format
 
@@ -95,7 +95,7 @@ Full column specifications (types, required fields, descriptions) are in [standa
 | lngt_cm | Length class in cm (used to match to `ind_age` on a 1 cm bin) |
 | n_entire_bin | Raised count (total catch) of fish in this length class in this haul |
 
-**`mean_length_at_age`** (`outputs/<region>/<prefix>_mean_length_at_age.rds`): one row per survey × species × year × quarter × age × sex
+**`mean_length_at_age`** (`outputs/<region>/<prefix>_mean_length_at_age.rds`, `outputs/mean_length_all.rds`): one row per survey × species × year × quarter × age × sex
 
 Calculated from `ind_age`, and `len_freq` in case of length-stratified subsampling. The `north-east-atlantic-datras` case for example uses the approach in [Bettoli & Miranda (2001)](https://doi.org/10.1577/1548-8675(2001)021%3C0425:CNAEML%3E2.0.CO;2), where aged fish (from length-stratified subsample) are extrapolated to the catch, i.e., each fish is weighted by the inverse sampling fraction of its 1 cm length bin. Sex-specific rows use the sex ratio of the aged fish in each length bin. See the region's `mean_length_at_age_` script for details. Other regions may have other pipelines for reaching the same final result; a mean length-at-age by survey, year, quarter, and sex.
 
@@ -126,8 +126,6 @@ Calculated from `ind_age`, and `len_freq` in case of length-stratified subsampli
 * Sex-specific mean length at age: the sex ratio comes from the pooled sample of survey*species*`year_num`, within each 1 cm length bin. Note this isn't calculated at the haul level (because in a haul, we may have to few samples to calulcate reliable sex-ratios by length bin (1 cm), whereas at the survey*species*`year_num` level, about 91% of the aged fish sit in bins with more than 10 aged fish). Anchor if this is valid!
 
 * Include or not include raw data? It's only 150 MB for DATRAS across all surveys!
-
-* Shape files for each region? Or survey? (messy in DATRAS)
 
 * That Canadian survey on DATRAS (Can-Mar) & the Mediterranian one
 
