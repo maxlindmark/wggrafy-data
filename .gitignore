@@ -22,6 +22,9 @@
 .Rproj.user/
 *.html
 
+# macOS
+.DS_Store
+
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
