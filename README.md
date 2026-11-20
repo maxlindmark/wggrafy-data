@@ -75,7 +75,7 @@ Full column specifications (types, required fields, descriptions) are in [standa
 | `ind_age` | unique aged fish record (`n` = number of individual fish) |
 | `mean_length_at_age` | survey × species × year × quarter × age × sex |
 
-### haul
+### Hauls
 `haul` (`outputs/<region>/<prefix>_haul.rds`, `outputs/haul_all.rds`): one row per haul, all hauls of the surveys (including hauls without catch of the species, needed to create zeros)
 
 | Column | Description |
@@ -91,7 +91,7 @@ Full column specifications (types, required fields, descriptions) are in [standa
 | effort | Fishing effort of the haul, in the unit given by `effort_type` |
 | effort_type | Type and unit of effort, e.g. `swept_area_km2` |
 
-### len_freq
+### Length-frequency distribution of the catch
 `len_freq` (`outputs/<region>/<prefix>_len_freq.rds`, `outputs/len_freq_all.rds`): one row per haul × species × length bin where the species was caught (zeros: see [Example usage](#example-usage))
 
 | Column | Description |
@@ -105,7 +105,7 @@ Full column specifications (types, required fields, descriptions) are in [standa
 
 \* NA (instead of a number) means the catch of that species in that haul is unknown. This could be because the species was not recorded in the haul, its catch records are invalid, or its catch was recorded without lengths (e.g. total number only). Keep these as NA when creating zeros. How each region sets them is documented in `cleaning_codes/<region>/cleaning_notes/`.
 
-### ind_age
+### Individual length-at-age data
 `ind_age` (`outputs/<region>/<prefix>_ind_age.rds`, `outputs/ind_age_all.rds`): one row per unique aged fish record
 
 | Column | Description |
@@ -123,7 +123,7 @@ Full column specifications (types, required fields, descriptions) are in [standa
 
 \* A `haul_id` containing `pooled` refers to aged fish whose haul is unknown (in DATRAS, the station or haul number is missing in their age records), e.g. `NS-IBTS:1994:2:SE:77AR:GOV:pooled:41G2` (survey, year, quarter, country, ship, gear, `pooled`, and the ICES rectangle). We keep them here because the summarised `mean_length_at_age` table does not need the exact haul, only the "strata" the fish belongs to (survey × year × quarter), which the simplified ID gives. The reason for keeping these is that in DATRAS they are 11.8% of the aged fish (503,012 of 4,253,615). But note, the id is not in the `haul` table, so these fish have no position and no catch, and cannot be used in spatially explicit analysis. How each region sets them is documented in `cleaning_codes/<region>/cleaning_notes/`.
 
-### mean_length_at_age
+### Summarised mean length-at-age
 `mean_length_at_age` (`outputs/<region>/<prefix>_mean_length_at_age.rds`, `outputs/mean_length_all.rds`): one row per survey × species × year × quarter × age × sex
 
 Calculated from `ind_age`, and `len_freq` unless the aged fish are a random subsample of the catch (`sampling_type` = `random`). The `north_east_atlantic_datras` case for example uses the approach in [Bettoli & Miranda (2001)](https://doi.org/10.1577/1548-8675(2001)021%3C0425:CNAEML%3E2.0.CO;2), where aged fish (length-stratified or unknown sampling) are extrapolated to the catch, i.e., each fish is weighted by the inverse sampling fraction of its length bin (the `len_freq` bin its length falls in). Sex-specific rows use the sex ratio of the aged fish in each length bin. See the region's `mean_length_at_age_` script for details. Other regions may have other pipelines for reaching the same final output, which is a mean length-at-age by survey, year, quarter, and sex.
