@@ -1,11 +1,11 @@
 # Purpose:   Summary plots and data coverage table for cleaned NEA DATRAS data.
 #
-# Input:     outputs/north-east-atlantic-datras/nea_datras_length_clean.rds
+# Input:     outputs/north_east_atlantic_datras/nea_datras_ind_age.rds
 #
 # Output:    summary/species_overview_nea_datras.png
 #            (meta table printed to console)
 #
-# Modified:  2026-09-21
+# Modified:  2026-11-20
 # Author:    Max Lindmark
 
 library(dplyr)
@@ -15,14 +15,19 @@ library(ggtext)
 library(here)
 home <- here::here()
 
-ca_all <- readRDS(file.path(home, "outputs/north-east-atlantic-datras/nea_datras_length_clean.rds"))
+# Survey and year from haul_id (also for pooled haul ids, which are not in haul)
+ca_all <- readRDS(file.path(home, "outputs/north_east_atlantic_datras/nea_datras_ind_age.rds")) |>
+  mutate(
+    survey = sub(":.*", "", haul_id),
+    year = as.integer(sub("^[^:]*:([0-9]+):.*", "\\1", haul_id))
+  )
 
 # -----------------------------------------------------------------------------
 # Species × year coverage bubble plot
 # -----------------------------------------------------------------------------
 ca_all |>
   summarise(
-    n = n(),
+    n = sum(n),
     n_surveys = n_distinct(survey),
     .by = c(species, year)
   ) |>
@@ -74,15 +79,15 @@ ggsave(file.path(home, "summary/species_overview_nea_datras.png"),
 # -----------------------------------------------------------------------------
 meta <- ca_all |>
   dplyr::summarise(
-    n_individuals = n(),
+    n_individuals = sum(n),
     n_hauls = n_distinct(haul_id),
     n_years = n_distinct(year),
     year_min = min(as.integer(year)),
     year_max = max(as.integer(year)),
     age_min = min(age),
     age_max = max(age),
-    lngt_min = min(lngt_cm, na.rm = TRUE),
-    lngt_max = max(lngt_cm, na.rm = TRUE),
+    lngt_min = min(lngt, na.rm = TRUE),
+    lngt_max = max(lngt, na.rm = TRUE),
     .by = c(species, survey)
   ) |>
   dplyr::arrange(species, survey)

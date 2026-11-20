@@ -1,7 +1,7 @@
 # NEA DATRAS: Species-specific length corrections
 
-Corrections applied in `cleaning_codes/north-east-atlantic-datras/clean_north_east_atlantic_datras.R`.  
-All issues were identified from per-species length-at-age plots (coloured by `lngt_code`) saved in `cleaning_codes/north-east-atlantic-datras/check_species_laa/`.
+Corrections applied in `cleaning_codes/north_east_atlantic_datras/clean_north_east_atlantic_datras.R`.  
+All issues were identified from per-species length-at-age plots (coloured by `lngt_code`) saved in `cleaning_codes/north_east_atlantic_datras/check_species_laa/`.
 
 The dominant error pattern is lengths 10× too large. In BITS and NS-IBTS these are `lngt_code == 1` records where lengths were stored in mm but treated as cm. In SP-NORTH 2017 (*Zeus faber*, *Trisopterus luscus*) the code is `.` (mm) but `lngt_clas` is 10× too large for mm. Where dividing by 10 yields a biologically plausible result the fix is applied; where it does not (values still implausible after correction), records are removed instead.
 
@@ -12,8 +12,8 @@ The dominant error pattern is lengths 10× too large. In BITS and NS-IBTS these 
 | *Zeus faber* | all (found in SP-NORTH 2017) | `lngt_code .` but value 10× too large (`lngt_cm > 100`) | ÷ 10; residual values > 75 cm removed |
 | *Trisopterus luscus* | all (found in SP-NORTH 2017) | `lngt_code .` but value 10× too large (`lngt_cm > 50`) | ÷ 10 |
 | *Platichthys flesus* | BITS | mm stored as cm (`lngt_cm > 70`) | ÷ 10; records with age > 30 removed |
-| *Lepidorhombus boscii* | SP-NORTH | horizontal band at 50–90 cm unrelated to unit code | remove `lngt_cm > 45`; **TODO: age-0 range still implausible, needs further investigation** |
-| *Lepidorhombus whiffiagonis* | SP-NORTH, SP-PORC | outliers above species max (~60 cm) | remove `lngt_cm > 65`; **TODO: SP-NORTH age-0 still implausible, SP-PORC needs revisiting** |
+| *Lepidorhombus boscii* | SP-NORTH | horizontal band at 50–90 cm unrelated to unit code | remove `lngt_cm > 45`; age-0 range still implausible (see [To do](#to-do)) |
+| *Lepidorhombus whiffiagonis* | SP-NORTH, SP-PORC | outliers above species max (~60 cm) | remove `lngt_cm > 65`; SP-NORTH age-0 still implausible, SP-PORC to revisit (see [To do](#to-do)) |
 | *Lophius piscatorius* | NS-IBTS | age-0 fish above 40 cm (impossible for 0-group) | remove |
 | *Clupea harengus* | NS-IBTS | mm stored as cm at young ages (`lngt_cm > 60`) | ÷ 10 |
 | *Conger conger* | all | mm stored as cm (`lngt_cm > 400`) | ÷ 10 |
@@ -39,12 +39,8 @@ Unit mismatch confined to BITS survey. After ÷ 10 fix, a handful of age records
 ### *Lepidorhombus boscii* (Four-spot Megrim, max ~45 cm)
 SP-NORTH shows a distinct horizontal band of records at 50–90 cm. Unlike the typical mm/cm mismatch, dividing by 10 yields 5–9 cm for old fish, which is also implausible. The source of the error is unclear; records above 45 cm in SP-NORTH are removed.
 
-**TODO:** After the > 45 cm fix, SP-NORTH still contains age-0 fish spanning 0–40 cm, which is biologically implausible (age-0 individuals should be a narrow band at small sizes). The source of this pattern is unclear. SP-NORTH data for this species should be excluded or investigated further before use.
-
 ### *Lepidorhombus whiffiagonis* (Megrim, max ~60 cm)
 SP-NORTH and SP-PORC show scattered outliers above 65 cm. Still looks somewhat unusual even after removal; worth revisiting with additional data.
-
-**TODO:** After the > 65 cm fix, SP-NORTH still shows a biologically implausible length range at age 0 (similar to *L. boscii* above). SP-PORC also remains suspicious and should be revisited. Both surveys for this species should be treated with caution.
 
 ### *Lophius piscatorius* (Angler, NS-IBTS)
 Age-0 fish recorded above 40 cm are impossible for 0-group individuals. Removed.
@@ -75,3 +71,9 @@ BITS contains a handful of `lngt_code 1` records at 16–30 cm for age 1–2 fis
 
 ### *Phycis blennoides* (Greater Forkbeard)
 Plots show something unusual but no clean correction could be identified. No action taken; flagged for future review.
+
+## To do
+
+- *Lepidorhombus boscii*, SP-NORTH: after the > 45 cm fix, age-0 fish still span 3 to 40 cm (630 fish), which is biologically implausible (age-0 fish should be a narrow band at small sizes). The source is unclear; exclude or investigate further before use.
+- *Lepidorhombus whiffiagonis*: after the > 65 cm fix, age-0 fish in SP-NORTH still span 5 to 50 cm (165 fish; EVHOE 5 to 19 cm, SP-PORC 3 to 12 cm), as for *L. boscii*. SP-PORC also remains suspicious and should be revisited. Treat both surveys with caution for this species.
+- *Phycis blennoides*: review the unusual pattern in the plots.
